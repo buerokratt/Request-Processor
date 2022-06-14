@@ -1,4 +1,5 @@
-﻿using RequestProcessor.Models;
+﻿using System;
+using RequestProcessor.Models;
 using RequestProcessor.AsyncProcessor;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -16,6 +17,7 @@ namespace RequestProcessor.UnitTests
             // Arrange
             var processor = new Mock<IAsyncProcessorService<Message>>();
             var logger = new Mock<ILogger<AsyncProcessorHostedService<Message>>>();
+            logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
 
             using var sut =
                 new AsyncProcessorHostedService<Message>(
@@ -35,6 +37,12 @@ namespace RequestProcessor.UnitTests
 
             processor.Verify(p => p.ProcessRequestsAsync(), Times.AtLeastOnce);
             Assert.False(sut.IsRunning);
+            logger.Verify(x => x.Log(
+                LogLevel.Information,
+                new EventId(11, "AsyncProcessorStateChange"),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Exactly(2));
         }
 
         [Fact]
@@ -43,6 +51,7 @@ namespace RequestProcessor.UnitTests
             // Arrange
             var processor = new Mock<IAsyncProcessorService<Message>>();
             var logger = new Mock<ILogger<AsyncProcessorHostedService<Message>>>();
+            logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
 
             using var sut =
                 new AsyncProcessorHostedService<Message>(
@@ -69,6 +78,12 @@ namespace RequestProcessor.UnitTests
             // Assert
             processor.Verify(p => p.ProcessRequestsAsync(), Times.Never);
             Assert.False(sut.IsRunning);
+            logger.Verify(x => x.Log(
+                LogLevel.Information,
+                new EventId(11, "AsyncProcessorStateChange"),
+                It.Is<It.IsAnyType>((v, t) => true),
+                It.IsAny<Exception>(),
+                It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Exactly(2));
         }
     }
 }
