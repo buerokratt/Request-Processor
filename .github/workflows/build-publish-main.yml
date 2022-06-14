@@ -1,0 +1,16 @@
+name: Request Processor Build and Publish Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  PackageDeploy:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+
+    steps:
+    - uses: actions/checkout@v3
