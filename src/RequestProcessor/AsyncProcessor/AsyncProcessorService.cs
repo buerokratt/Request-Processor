@@ -1,10 +1,13 @@
 using RequestProcessor.AsyncProcessor.Extensions;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 
 namespace RequestProcessor.AsyncProcessor
 {
+    // Temporarily exclude from code coverage
+    [ExcludeFromCodeCoverage]
     public abstract class AsyncProcessorService<TPayload, TSettings> : IAsyncProcessorService<TPayload>
         where TSettings : AsyncProcessorSettings
     {
