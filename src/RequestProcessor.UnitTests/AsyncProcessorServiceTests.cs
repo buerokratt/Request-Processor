@@ -1,12 +1,10 @@
 using System;
-using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using RequestProcessor.AsyncProcessor;
 using RequestProcessor.Models;
-using RichardSzalay.MockHttp;
 using Xunit;
 
 namespace RequestProcessor.UnitTests
@@ -32,7 +30,7 @@ namespace RequestProcessor.UnitTests
         {
             // Arrange
             Mock<ILogger<ApsTestImplementation>> logger = new();
-            logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
+            _ = logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
             var sut = new ApsTestImplementation(new Mock<IHttpClientFactory>().Object, new AsyncProcessorSettings(),
                 logger.Object);
 
@@ -64,7 +62,7 @@ namespace RequestProcessor.UnitTests
         {
             // Arrange
             Mock<ILogger<ApsTestImplementation>> logger = new();
-            logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
+            _ = logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
             var sut = new ApsTestImplementation(new Mock<IHttpClientFactory>().Object, new AsyncProcessorSettings(),
                 logger.Object);
 
@@ -80,6 +78,5 @@ namespace RequestProcessor.UnitTests
                 It.IsAny<HttpRequestException>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Never);
         }
-
     }
 }
