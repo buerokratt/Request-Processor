@@ -7,12 +7,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  PackageDeploy:
+  BuildAndTest:
     runs-on: ubuntu-22.04
     permissions:
       contents: read
-      packages: write
-      id-token: write
     env:
       BUILD_VER: 0.0.${{ github.run_number }}
     steps:
@@ -83,8 +81,17 @@ jobs:
     #     name: mutation-report
     #     path: src/StrykerOutput
 
+  PackageAndPublish:
+    needs: BuildAndTest
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    env:
+      BUILD_VER: 0.0.${{ github.run_number }}
+    steps:
+    - uses: actions/checkout@v3
     - name: Pack
-      run: dotnet pack src/*.sln --no-build --configuration Release /p:Version=${{ env.BUILD_VER }} --output nupkgs
+      run: dotnet pack src/*.sln --configuration Release /p:Version=${{ env.BUILD_VER }} --output nupkgs
         
     - name: Publish To Nuget
       run: dotnet nuget push nupkgs/*.nupkg -s 'https://api.nuget.org/v3/index.json' -k ${{secrets.NUGET_GALLERY_API_KEY}}
