@@ -33,7 +33,7 @@ jobs:
       run: dotnet format src/*.sln --no-restore --verify-no-changes
       
     - name: Dotnet Build
-      run: dotnet build src/*.sln --no-restore  -p:Version=${{ env.BUILD_VER }} 
+      run: dotnet build src/*.sln --no-restore --configuration Release -p:Version=${{ env.BUILD_VER }} 
       
     - name: Dotnet Publish
       working-directory: src
@@ -86,5 +86,5 @@ jobs:
     - name: Pack
       run: dotnet pack src/*.sln --no-build --configuration Release /p:Version=${{ env.BUILD_VER }}
         
-    - name: Publish
+    - name: Publish To Nuget
       run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_GALLERY_API_KEY}}
