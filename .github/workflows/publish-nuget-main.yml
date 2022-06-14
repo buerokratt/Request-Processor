@@ -12,7 +12,7 @@ jobs:
     permissions:
       contents: read
     env:
-      BUILD_VER: 0.0.${{ github.run_number }}
+      BUILD_VER: 1.0.${{ github.run_number }}
     steps:
     - uses: actions/checkout@v3
 
