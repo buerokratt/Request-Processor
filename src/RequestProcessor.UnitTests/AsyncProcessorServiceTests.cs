@@ -16,24 +16,24 @@ namespace RequestProcessor.UnitTests
         [Fact]
         public void AsyncProcessorImplementationThrowsForNullConfiguration()
         {
-            Mock<ILogger<APSTestImplementation>> logger = new();
-            _ = Assert.Throws<ArgumentNullException>(() => new APSTestImplementation(null, new AsyncProcessorSettings(), logger.Object));
+            Mock<ILogger<ApsTestImplementation>> logger = new();
+            _ = Assert.Throws<ArgumentNullException>(() => new ApsTestImplementation(null, new AsyncProcessorSettings(), logger.Object));
         }
 
         [Fact]
         public void AsyncProcessorImplementationThrowsForNullClient()
         {
-            Mock<ILogger<APSTestImplementation>> logger = new();
-            _ = Assert.Throws<ArgumentNullException>(() => new APSTestImplementation(new Mock<IHttpClientFactory>().Object, null, logger.Object));
+            Mock<ILogger<ApsTestImplementation>> logger = new();
+            _ = Assert.Throws<ArgumentNullException>(() => new ApsTestImplementation(new Mock<IHttpClientFactory>().Object, null, logger.Object));
         }
 
         [Fact]
         public async Task EnsureMessageIsDequeued()
         {
             // Arrange
-            Mock<ILogger<APSTestImplementation>> logger = new();
+            Mock<ILogger<ApsTestImplementation>> logger = new();
             logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
-            var sut = new APSTestImplementation(new Mock<IHttpClientFactory>().Object, new AsyncProcessorSettings(),
+            var sut = new ApsTestImplementation(new Mock<IHttpClientFactory>().Object, new AsyncProcessorSettings(),
                 logger.Object);
             
             // Act
@@ -50,7 +50,7 @@ namespace RequestProcessor.UnitTests
             await sut.ProcessRequestsAsync().ConfigureAwait(true);
 
             // Assert
-            Assert.Equal(1, sut.messages.Count);
+            Assert.Equal(1, sut.Messages.Count);
             logger.Verify(x => x.Log(
                 LogLevel.Information,
                 new EventId(12, "AsyncProcessorTelemetry"),
@@ -63,16 +63,16 @@ namespace RequestProcessor.UnitTests
         public async Task EnsureTelemetryNotLoggedIfNothingQueued()
         {
             // Arrange
-            Mock<ILogger<APSTestImplementation>> logger = new();
+            Mock<ILogger<ApsTestImplementation>> logger = new();
             logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
-            var sut = new APSTestImplementation(new Mock<IHttpClientFactory>().Object, new AsyncProcessorSettings(),
+            var sut = new ApsTestImplementation(new Mock<IHttpClientFactory>().Object, new AsyncProcessorSettings(),
                 logger.Object);
             
             // Act
             await sut.ProcessRequestsAsync().ConfigureAwait(true);
 
             // Assert
-            Assert.Equal(0, sut.messages.Count);
+            Assert.Equal(0, sut.Messages.Count);
             logger.Verify(x => x.Log(
                 LogLevel.Information,
                 new EventId(12, "AsyncProcessorTelemetry"),

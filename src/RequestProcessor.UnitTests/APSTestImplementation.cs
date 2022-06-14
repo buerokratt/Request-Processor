@@ -7,15 +7,15 @@ using RequestProcessor.Models;
 
 namespace RequestProcessor.UnitTests
 {
-    public class APSTestImplementation : AsyncProcessorService<Message, AsyncProcessorSettings>
+    public class ApsTestImplementation : AsyncProcessorService<Message, AsyncProcessorSettings>
     {
-        public IList<Message> messages = new List<Message>();
+        public readonly IList<Message> Messages = new List<Message>();
         
-        public APSTestImplementation(IHttpClientFactory httpClientFactory, AsyncProcessorSettings config, ILogger logger) : base(httpClientFactory, config, logger) {}
+        public ApsTestImplementation(IHttpClientFactory httpClientFactory, AsyncProcessorSettings config, ILogger logger) : base(httpClientFactory, config, logger) {}
 
         public override Task ProcessRequestAsync(Message payload)
         {
-            messages.Add(payload);
+            Messages.Add(payload);
 
             return Task.CompletedTask;
         }
