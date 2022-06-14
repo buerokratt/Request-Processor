@@ -84,7 +84,7 @@ jobs:
         path: src/StrykerOutput
 
     - name: Pack
-        run: dotnet pack --no-build --configuration Release /p:Version=${{ env.BUILD_VER }}
+      run: dotnet pack --no-build --configuration Release /p:Version=${{ env.BUILD_VER }}
         
-      - name: Publish
-        run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_GALLERY_API_KEY}}
+    - name: Publish
+      run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_GALLERY_API_KEY}}
