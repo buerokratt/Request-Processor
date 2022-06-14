@@ -1,5 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace RequestProcessor.AsyncProcessor
 {
+    // No logic so no unit tests are required
+    [ExcludeFromCodeCoverage]
     public class AsyncProcessorSettings
     {
         private const string DefaultHttpClientName = "DmrCallbackClient";

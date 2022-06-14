@@ -1,8 +1,11 @@
 using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics.CodeAnalysis;
 
 namespace RequestProcessor.Models
 {
+    // No logic so no unit tests are required
+    [ExcludeFromCodeCoverage]
     public class HeadersInput
     {
         [Required]

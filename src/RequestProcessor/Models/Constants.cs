@@ -1,5 +1,9 @@
-﻿namespace RequestProcessor.Models
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace RequestProcessor.Models
 {
+    // No logic so no unit tests are required
+    [ExcludeFromCodeCoverage]
     public static class Constants
     {
         /// <summary>
