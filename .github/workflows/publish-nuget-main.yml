@@ -87,4 +87,4 @@ jobs:
       run: dotnet pack src/*.sln --no-build --configuration Release /p:Version=${{ env.BUILD_VER }} --output nupkgs
         
     - name: Publish To Nuget
-      run: dotnet nuget push nupkgs/*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_GALLERY_API_KEY}}
+      run: dotnet nuget push nupkgs/*.nupkg -s 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_GALLERY_API_KEY}}
