@@ -32,6 +32,8 @@ namespace RequestProcessor.AsyncProcessor
             IsRunning = true;
             StartTimer();
 
+            logger.AsyncProcessorStateChange("AsyncProcessor Started");
+
             return Task.CompletedTask;
         }
 
@@ -39,6 +41,8 @@ namespace RequestProcessor.AsyncProcessor
         {
             IsRunning = false;
             StopTimer();
+
+            logger.AsyncProcessorStateChange("AsyncProcessor Stopped");
 
             return Task.CompletedTask;
         }
@@ -69,11 +73,7 @@ namespace RequestProcessor.AsyncProcessor
 
             try
             {
-                self.logger.AsyncProcessorStateChange("started");
-
                 await self.service.ProcessRequestsAsync().ConfigureAwait(true);
-
-                self.logger.AsyncProcessorStateChange("completed");
             }
             catch (Exception ex)
             {

@@ -1,4 +1,5 @@
-﻿using RequestProcessor.AsyncProcessor;
+﻿using RequestProcessor.Models;
+using RequestProcessor.AsyncProcessor;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System.Threading;
