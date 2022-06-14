@@ -1,8 +1,8 @@
+using Microsoft.Extensions.Logging;
 using RequestProcessor.AsyncProcessor.Extensions;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
-using Microsoft.Extensions.Logging;
 
 namespace RequestProcessor.AsyncProcessor
 {
