@@ -17,7 +17,7 @@ namespace RequestProcessor.UnitTests
             // Arrange
             var processor = new Mock<IAsyncProcessorService<Message>>();
             var logger = new Mock<ILogger<AsyncProcessorHostedService<Message>>>();
-            logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
+            _ = logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
 
             using var sut =
                 new AsyncProcessorHostedService<Message>(
@@ -51,7 +51,7 @@ namespace RequestProcessor.UnitTests
             // Arrange
             var processor = new Mock<IAsyncProcessorService<Message>>();
             var logger = new Mock<ILogger<AsyncProcessorHostedService<Message>>>();
-            logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
+            _ = logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
 
             using var sut =
                 new AsyncProcessorHostedService<Message>(
