@@ -73,18 +73,18 @@ jobs:
         recreate: true
         path: code-coverage-results.md
   
-    - name: Mutation Test
-      working-directory: src
-      run: dotnet stryker
+    # - name: Mutation Test
+    #   working-directory: src
+    #   run: dotnet stryker
     
-    - name: Upload Mutation Report
-      uses: actions/upload-artifact@v3.0.0
-      with:
-        name: mutation-report
-        path: src/StrykerOutput
+    # - name: Upload Mutation Report
+    #   uses: actions/upload-artifact@v3.0.0
+    #   with:
+    #     name: mutation-report
+    #     path: src/StrykerOutput
 
     - name: Pack
-      run: dotnet pack --no-build --configuration Release /p:Version=${{ env.BUILD_VER }}
+      run: dotnet pack src/*.sln --no-build --configuration Release /p:Version=${{ env.BUILD_VER }}
         
     - name: Publish
       run: nuget push **\*.nupkg -Source 'https://api.nuget.org/v3/index.json' -ApiKey ${{secrets.NUGET_GALLERY_API_KEY}}
