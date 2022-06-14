@@ -3,8 +3,6 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace RequestProcessor.AsyncProcessor.Extensions
 {
-    // No logic so no unit tests are required
-    [ExcludeFromCodeCoverage]
     public static class LoggerExtensions
     {
         private static readonly Action<ILogger, Exception?> processorFailed =
