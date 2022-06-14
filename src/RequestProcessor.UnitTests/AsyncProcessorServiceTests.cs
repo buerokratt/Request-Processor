@@ -35,7 +35,7 @@ namespace RequestProcessor.UnitTests
             logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
             var sut = new ApsTestImplementation(new Mock<IHttpClientFactory>().Object, new AsyncProcessorSettings(),
                 logger.Object);
-            
+
             // Act
             sut.Enqueue(new Message
             {
@@ -67,7 +67,7 @@ namespace RequestProcessor.UnitTests
             logger.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
             var sut = new ApsTestImplementation(new Mock<IHttpClientFactory>().Object, new AsyncProcessorSettings(),
                 logger.Object);
-            
+
             // Act
             await sut.ProcessRequestsAsync().ConfigureAwait(true);
 
