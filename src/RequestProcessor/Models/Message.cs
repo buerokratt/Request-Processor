@@ -6,7 +6,7 @@ namespace RequestProcessor.Models
     [ExcludeFromCodeCoverage]
     public class Message
     {
-        public string Payload { get; set; }
-        public HeadersInput Headers { get; set; }
+        public string? Payload { get; set; }
+        public HeadersInput? Headers { get; set; }
     }
 }
