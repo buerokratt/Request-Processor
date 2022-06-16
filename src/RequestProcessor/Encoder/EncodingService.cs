@@ -1,7 +1,6 @@
-﻿using MockBot.Api.Interfaces;
-using System.Text;
+﻿using System.Text;
 
-namespace MockBot.Api.Services
+namespace RequestProcessor.Services.Encoder
 {
     public class EncodingService : IEncodingService
     {

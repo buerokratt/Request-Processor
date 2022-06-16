@@ -1,4 +1,4 @@
-﻿namespace MockBot.Api.Interfaces
+﻿namespace RequestProcessor.Services.Encoder
 {
     public interface IEncodingService
     {

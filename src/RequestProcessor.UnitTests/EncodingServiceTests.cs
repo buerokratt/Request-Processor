@@ -1,4 +1,4 @@
-﻿using MockBot.Api.Services;
+﻿using RequestProcessor.Services.Encoder;
 using System;
 using Xunit;
 
