@@ -77,6 +77,7 @@ namespace RequestProcessor.Dmr
             };
 
             requestMessage.Headers.Add(Constants.XMessageIdHeaderName, request.Headers.XMessageId);
+            requestMessage.Headers.Add(Constants.XMessageIdRefHeaderName, request.Headers.XMessageIdRef);
             requestMessage.Headers.Add(Constants.XSendToHeaderName, request.Headers.XSendTo);
             requestMessage.Headers.Add(Constants.XSentByHeaderName, request.Headers.XSentBy);
             requestMessage.Headers.Add(Constants.XModelTypeHeaderName, request.Headers.XModelType);
