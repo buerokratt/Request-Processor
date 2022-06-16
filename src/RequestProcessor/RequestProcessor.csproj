@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
@@ -13,9 +13,6 @@
     <None Remove="Microsoft.Extensions.Http" />
     <None Remove="Microsoft.Extensions.Hosting" />
     <None Remove="Microsoft.CodeAnalysis.NetAnalyzers" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="AsyncProcessor\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Core" Version="2.1.0" />
