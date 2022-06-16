@@ -3,6 +3,7 @@ using MockBot.Api.Services.Dmr.Extensions;
 using RequestProcessor.AsyncProcessor;
 using RequestProcessor.Dmr.Extensions;
 using RequestProcessor.Models;
+using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
@@ -37,14 +38,16 @@ namespace RequestProcessor.Dmr
                 // Send request
                 var response = await HttpClient.SendAsync(requestMessage).ConfigureAwait(false);
 
-                Console.WriteLine(await response.Content.ReadAsStringAsync().ConfigureAwait(false));
-                _ = response.EnsureSuccessStatusCode();
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorReason = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    throw new HttpRequestException(errorReason);
+                }
 
                 Logger.DmrCallback(payload.Payload?.Classification ?? string.Empty, payload.Payload?.Message ?? string.Empty);
             }
             catch (HttpRequestException exception)
             {
-                Console.WriteLine(exception.ToString());
                 Logger.DmrCallbackFailed(exception);
             }
         }
@@ -81,6 +84,9 @@ namespace RequestProcessor.Dmr
             requestMessage.Headers.Add(Constants.XSendToHeaderName, request.Headers.XSendTo);
             requestMessage.Headers.Add(Constants.XSentByHeaderName, request.Headers.XSentBy);
             requestMessage.Headers.Add(Constants.XModelTypeHeaderName, request.Headers.XModelType);
+
+            // Unless specified by the caller - the use the text/plain mime type.
+            _ = content.Headers.ContentType = MediaTypeHeaderValue.Parse(request.Headers.ContentType ?? MediaTypeNames.Text.Plain);
 
             return requestMessage;
         }
