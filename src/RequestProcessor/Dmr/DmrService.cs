@@ -85,7 +85,7 @@ namespace RequestProcessor.Dmr
             requestMessage.Headers.Add(Constants.XSentByHeaderName, request.Headers.XSentBy);
             requestMessage.Headers.Add(Constants.XModelTypeHeaderName, request.Headers.XModelType);
 
-            // Unless specified by the caller - the use the text/plain mime type.
+            // Unless specified by the caller - use the text/plain mime type.
             _ = content.Headers.ContentType = MediaTypeHeaderValue.Parse(request.Headers.ContentType ?? MediaTypeNames.Text.Plain);
 
             return requestMessage;
