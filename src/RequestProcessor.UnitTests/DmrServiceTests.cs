@@ -96,7 +96,7 @@ namespace RequestProcessor.UnitTests
             var headers = new HeadersInput
             {
                 XSentBy = "MockClassifier.UnitTests.Services.Dmr.DmrServiceTests",
-                XSendTo = "Classifier",
+                XSendTo = Constants.ClassifierId,
                 XMessageId = "1f7b356d-a6f4-4aeb-85cd-9d570dbc7606",
                 XMessageIdRef = "5822c6ef-177d-4dd7-b4c5-0d9d8c8d2c35",
                 XModelType = "application/vnd.classifier.classification+json;version=1",
