@@ -1,4 +1,4 @@
-name: Request Processor Build and Publish Pipeline
+name: Buerokratt Common Build and Publish Pipeline
 
 on:
   push:
