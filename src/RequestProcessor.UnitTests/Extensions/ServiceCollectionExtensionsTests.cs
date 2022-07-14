@@ -1,13 +1,13 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Buerokratt.Common.AsyncProcessor;
+using Buerokratt.Common.Dmr;
+using Buerokratt.Common.Dmr.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using MockBot.Api.Services.Dmr.Extensions;
-using RequestProcessor.AsyncProcessor;
-using RequestProcessor.Dmr;
 using System;
 using System.Linq;
 using Xunit;
 
-namespace RequestProcessor.UnitTests.Extensions
+namespace Buerokratt.Common.UnitTests.Extensions
 {
     public sealed class ServiceCollectionExtensionsTests
     {

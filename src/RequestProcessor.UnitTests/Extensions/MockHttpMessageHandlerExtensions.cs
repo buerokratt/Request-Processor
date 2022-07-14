@@ -1,11 +1,11 @@
-﻿using RequestProcessor.Dmr;
-using RequestProcessor.Models;
-using RequestProcessor.Services.Encoder;
+﻿using Buerokratt.Common.Dmr;
+using Buerokratt.Common.Encoder;
+using Buerokratt.Common.Models;
 using RichardSzalay.MockHttp;
 using System.Net;
 using System.Text.Json;
 
-namespace RequestProcessor.UnitTests.Extensions
+namespace Buerokratt.Common.UnitTests.Extensions
 {
     internal static class MockHttpMessageHandlerExtensions
     {

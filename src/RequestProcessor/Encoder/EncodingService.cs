@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace RequestProcessor.Services.Encoder
+namespace Buerokratt.Common.Encoder
 {
     public class EncodingService : IEncodingService
     {

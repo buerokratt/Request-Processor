@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 
-namespace RequestProcessor.AsyncProcessor.Extensions
+namespace Buerokratt.Common.AsyncProcessor.Extensions
 {
     public static class LoggerExtensions
     {

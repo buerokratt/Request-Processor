@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics.CodeAnalysis;
 
-namespace RequestProcessor.Models
+namespace Buerokratt.Common.Models
 {
     // No logic so no unit tests are required
     [ExcludeFromCodeCoverage]

@@ -1,10 +1,8 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using Buerokratt.Common.AsyncProcessor;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using RequestProcessor.AsyncProcessor;
-using RequestProcessor.Dmr;
-using RequestProcessor.Models;
 
-namespace MockBot.Api.Services.Dmr.Extensions
+namespace Buerokratt.Common.Dmr.Extensions
 {
     /// <summary>
     /// Extension class to help add all services related to the DMR

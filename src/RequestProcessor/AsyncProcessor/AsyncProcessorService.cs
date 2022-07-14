@@ -1,9 +1,9 @@
-using RequestProcessor.AsyncProcessor.Extensions;
 using System.Collections.Concurrent;
 using System.Diagnostics;
+using Buerokratt.Common.AsyncProcessor.Extensions;
 using Microsoft.Extensions.Logging;
 
-namespace RequestProcessor.AsyncProcessor
+namespace Buerokratt.Common.AsyncProcessor
 {
     public abstract class AsyncProcessorService<TPayload, TSettings> : IAsyncProcessorService<TPayload>
         where TSettings : AsyncProcessorSettings

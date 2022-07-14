@@ -1,8 +1,8 @@
+using Buerokratt.Common.AsyncProcessor.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using RequestProcessor.AsyncProcessor.Extensions;
 
-namespace RequestProcessor.AsyncProcessor
+namespace Buerokratt.Common.AsyncProcessor
 {
     /// <summary>
     /// A background hosted service that periodically triggers the request processor

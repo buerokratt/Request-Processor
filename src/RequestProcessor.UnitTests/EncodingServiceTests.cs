@@ -1,8 +1,8 @@
-﻿using RequestProcessor.Services.Encoder;
+﻿using Buerokratt.Common.Encoder;
 using System;
 using Xunit;
 
-namespace RequestProcessor.UnitTests
+namespace Buerokratt.Common.UnitTests
 {
     public class EncodingServiceTest
     {

@@ -1,13 +1,13 @@
 using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Buerokratt.Common.AsyncProcessor;
+using Buerokratt.Common.Models;
 using Microsoft.Extensions.Logging;
 using Moq;
-using RequestProcessor.AsyncProcessor;
-using RequestProcessor.Models;
 using Xunit;
 
-namespace RequestProcessor.UnitTests
+namespace Buerokratt.Common.UnitTests
 {
     public class AsyncProcessorServiceTests
     {

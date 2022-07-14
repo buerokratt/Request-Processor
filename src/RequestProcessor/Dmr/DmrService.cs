@@ -1,14 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
-using MockBot.Api.Services.Dmr.Extensions;
-using RequestProcessor.AsyncProcessor;
-using RequestProcessor.Dmr.Extensions;
-using RequestProcessor.Models;
+﻿using Buerokratt.Common.AsyncProcessor;
+using Buerokratt.Common.Dmr.Extensions;
+using Buerokratt.Common.Models;
+using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;
 using System.Text.Json;
 
-namespace RequestProcessor.Dmr
+namespace Buerokratt.Common.Dmr
 {
     /// <summary>
     /// A service that handles calls to the DMR API

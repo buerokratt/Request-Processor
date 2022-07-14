@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Buerokratt.Common.Dmr.Extensions;
+using Microsoft.Extensions.Logging;
 using Moq;
-using RequestProcessor.Dmr.Extensions;
 using System;
 using Xunit;
 
-namespace RequestProcessor.UnitTests.Extensions
+namespace Buerokratt.Common.UnitTests.Extensions
 {
     public class LoggerExtensionsTests
     {

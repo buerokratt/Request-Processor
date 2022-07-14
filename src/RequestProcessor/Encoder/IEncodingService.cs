@@ -1,4 +1,4 @@
-﻿namespace RequestProcessor.Services.Encoder
+﻿namespace Buerokratt.Common.Encoder
 {
     public interface IEncodingService
     {

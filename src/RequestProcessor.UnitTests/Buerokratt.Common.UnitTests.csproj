@@ -36,6 +36,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\RequestProcessor\RequestProcessor.csproj" />
+    <ProjectReference Include="..\RequestProcessor\Buerokratt.Common.csproj" />
   </ItemGroup>
 </Project>

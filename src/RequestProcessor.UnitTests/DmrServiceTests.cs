@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Buerokratt.Common.Dmr;
+using Buerokratt.Common.Models;
+using Buerokratt.Common.UnitTests.Extensions;
+using Microsoft.Extensions.Logging;
 using Moq;
-using RequestProcessor.Dmr;
-using RequestProcessor.Models;
-using RequestProcessor.UnitTests.Extensions;
 using RichardSzalay.MockHttp;
 using System;
 using System.Net;
@@ -10,7 +10,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace RequestProcessor.UnitTests
+namespace Buerokratt.Common.UnitTests
 {
     public sealed class DmrServiceTests : IDisposable
     {

@@ -1,7 +1,7 @@
-﻿using RequestProcessor.AsyncProcessor;
+﻿using Buerokratt.Common.AsyncProcessor;
 using System.Diagnostics.CodeAnalysis;
 
-namespace RequestProcessor.Dmr
+namespace Buerokratt.Common.Dmr
 {
     /// <summary>
     /// A settings object for <see cref="DmrService"/>

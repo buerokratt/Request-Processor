@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 
-namespace RequestProcessor.Dmr.Extensions
+namespace Buerokratt.Common.Dmr.Extensions
 {
     public static class LoggerExtensions
     {

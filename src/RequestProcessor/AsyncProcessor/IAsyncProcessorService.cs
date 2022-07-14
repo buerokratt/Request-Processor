@@ -1,4 +1,4 @@
-namespace RequestProcessor.AsyncProcessor
+namespace Buerokratt.Common.AsyncProcessor
 {
     public interface IAsyncProcessorService<TPayload>
     {

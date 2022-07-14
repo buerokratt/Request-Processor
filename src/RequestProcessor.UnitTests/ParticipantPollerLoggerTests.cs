@@ -1,4 +1,4 @@
-﻿using Buerokratt.Common.AsyncProcessor.Extensions;
+﻿using Buerokratt.Common.CentOps.Extensions;
 using Microsoft.Extensions.Logging;
 using Moq;
 using System;
@@ -6,53 +6,53 @@ using Xunit;
 
 namespace Buerokratt.Common.UnitTests
 {
-    public class AsyncProcessorLoggerTests
+    public class ParticipantPollerLoggerTests
     {
         [Fact]
-        public void AsyncProcessorFailedLoggerTest()
+        public void ParticipantCacheRefreshLogged()
         {
             var loggerMock = new Mock<ILogger>();
             _ = loggerMock.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
 
-            loggerMock.Object.AsyncProcessorFailed(new ArgumentNullException("Test"));
+            loggerMock.Object.ParticipantCacheRefreshed(1, 1);
 
             loggerMock.Verify(x => x.Log(
-                LogLevel.Error,
-                new EventId(10, "AsyncProcessorFailed"),
+                LogLevel.Information,
+                new EventId(5, "ParticipantCacheRefreshed"),
                 It.Is<It.IsAnyType>((v, t) => true),
-                It.IsAny<ArgumentNullException>(),
+                It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
         }
 
         [Fact]
-        public void AsyncProcessorStateChangeLoggerTest()
+        public void RefreshingParticipantCacheLogged()
         {
             var loggerMock = new Mock<ILogger>();
             _ = loggerMock.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
 
-            loggerMock.Object.AsyncProcessorStateChange("started");
+            loggerMock.Object.RefreshingParticipantCache();
 
             loggerMock.Verify(x => x.Log(
                 LogLevel.Information,
-                new EventId(11, "AsyncProcessorStateChange"),
+                new EventId(4, "RefreshingParticipantCache"),
                 It.Is<It.IsAnyType>((v, t) => true),
-                It.IsAny<ArgumentNullException>(),
+                It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
         }
 
         [Fact]
-        public void AsyncProcessorTelemetryLoggerTest()
+        public void ParticipantCacheRefreshFailureLogged()
         {
             var loggerMock = new Mock<ILogger>();
             _ = loggerMock.Setup(l => l.IsEnabled(It.IsAny<LogLevel>())).Returns(true);
 
-            loggerMock.Object.AsyncProcessorTelemetry(1, 1000L);
+            loggerMock.Object.ParticipantCacheRefreshFailure(new ArgumentNullException("Failed"));
 
             loggerMock.Verify(x => x.Log(
-                LogLevel.Information,
-                new EventId(12, "AsyncProcessorTelemetry"),
+                LogLevel.Critical,
+                new EventId(6, "ParticipantCacheRefreshFailure"),
                 It.Is<It.IsAnyType>((v, t) => true),
-                It.IsAny<ArgumentNullException>(),
+                It.IsAny<Exception>(),
                 It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
         }
     }

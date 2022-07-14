@@ -1,7 +1,7 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using RequestProcessor.Models;
+using Buerokratt.Common.Models;
 
-namespace RequestProcessor.Dmr
+namespace Buerokratt.Common.Dmr
 {
     /// <summary>
     /// The model for Dmr requests, including headers and payload/body

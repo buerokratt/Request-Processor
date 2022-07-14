@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics.CodeAnalysis;
 
-namespace RequestProcessor.Dmr
+namespace Buerokratt.Common.Dmr
 {
     /// <summary>
     /// The payload that the DMR handles

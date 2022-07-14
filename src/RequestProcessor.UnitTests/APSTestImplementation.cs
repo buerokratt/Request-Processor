@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Buerokratt.Common.AsyncProcessor;
+using Buerokratt.Common.Models;
 using Microsoft.Extensions.Logging;
-using RequestProcessor.AsyncProcessor;
-using RequestProcessor.Models;
 
-namespace RequestProcessor.UnitTests
+namespace Buerokratt.Common.UnitTests
 {
     public class ApsTestImplementation : AsyncProcessorService<Message, AsyncProcessorSettings>
     {

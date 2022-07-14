@@ -1,6 +1,6 @@
 using System.Diagnostics.CodeAnalysis;
 
-namespace RequestProcessor.AsyncProcessor
+namespace Buerokratt.Common.AsyncProcessor
 {
     // No logic so no unit tests are required
     [ExcludeFromCodeCoverage]
