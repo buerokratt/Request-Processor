@@ -223,7 +223,7 @@ namespace Buerokratt.Common.UnitTests
             {
                 CentOpsApiKey = "key",
                 CentOpsUri = new Uri("http://centops"),
-                ParticipantCacheRefreshIntervalMs = 1000
+                ParticipantCacheRefreshIntervalMs = 500
             };
 
             var sut = new ParticipantPoller(
