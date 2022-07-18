@@ -6,25 +6,25 @@ namespace Buerokratt.Common.CentOps
 {
     public class CentOpsService : ICentOpsService
     {
-        private readonly ConcurrentDictionary<string, Participant> participants;
+        private readonly ConcurrentDictionary<string, Participant> _participants;
 
         public CentOpsService(ConcurrentDictionary<string, Participant> participants)
         {
-            this.participants = participants ?? throw new ArgumentNullException(nameof(participants));
+            this._participants = participants ?? throw new ArgumentNullException(nameof(participants));
         }
 
         public Task<Uri?> FetchEndpointByName(string name)
         {
             return
                 Task.FromResult(
-                    participants.ContainsKey(name) && !string.IsNullOrEmpty(participants[name].Host)
-                    ? new Uri(participants[name].Host!)
+                    _participants.ContainsKey(name) && !string.IsNullOrEmpty(_participants[name].Host)
+                    ? new Uri(_participants[name].Host!)
                     : null);
         }
 
         public Task<IEnumerable<Participant>> FetchParticipantsByType(ParticipantType type)
         {
-            return Task.FromResult(participants.Values.Where(p => p.Type == type));
+            return Task.FromResult(_participants.Values.Where(p => p.Type == type));
         }
     }
 }

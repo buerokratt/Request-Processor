@@ -20,7 +20,7 @@ namespace Buerokratt.Common.CentOps.Extensions
             LoggerMessage.Define(
                  LogLevel.Critical,
                    new EventId(6, nameof(ParticipantCacheRefreshFailure)),
-                   "Participant Cache Refresh Failed!");
+                   "Participant cache refresh failed!");
 
         /// <summary>
         /// Creates a log message/event when the participant cache is refreshed.
