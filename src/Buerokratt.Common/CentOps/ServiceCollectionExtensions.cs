@@ -1,10 +1,9 @@
-﻿using Buerokratt.Common.CentOps;
-using Buerokratt.Common.CentOps.Interfaces;
+﻿using Buerokratt.Common.CentOps.Interfaces;
 using Buerokratt.Common.CentOps.Models;
 using Microsoft.Extensions.DependencyInjection;
 using System.Collections.Concurrent;
 
-namespace Buerokratt.Common.Utils
+namespace Buerokratt.Common.CentOps
 {
     public static class ServiceCollectionExtensions
     {

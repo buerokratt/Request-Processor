@@ -33,10 +33,5 @@ namespace Buerokratt.Common.Dmr.Extensions
             services.TryAddSingleton<IAsyncProcessorService<DmrRequest>, DmrService>();
             _ = services.AddHostedService<AsyncProcessorHostedService<DmrRequest>>();
         }
-
-        public static void AddParticipantPoller(ServiceCollection services, CentOpsServiceSettings settings)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
