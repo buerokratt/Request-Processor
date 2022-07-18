@@ -7,7 +7,7 @@ using Xunit;
 using Buerokratt.Common.AsyncProcessor;
 using Buerokratt.Common.Models;
 
-namespace Buerokratt.Common.UnitTests
+namespace Buerokratt.Common.UnitTests.AsyncProcessor
 {
     public class AsyncProcessorHostedServiceTests
     {

@@ -7,7 +7,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using Xunit;
 
-namespace Buerokratt.Common.UnitTests
+namespace Buerokratt.Common.UnitTests.AsyncProcessor
 {
     public class AsyncProcessorServiceTests
     {
