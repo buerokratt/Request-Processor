@@ -1,4 +1,4 @@
-name: Request Processor CI Pipeline
+name: Buerokratt Common CI Pipeline
 
 on:
   pull_request:
@@ -8,6 +8,8 @@ jobs:
   BuildTest:
     runs-on: ubuntu-latest
 
+    env:
+      BUILD_VER: 1.0.${{ github.run_number }}-prerelease
     steps:
     - uses: actions/checkout@v3
     
@@ -75,3 +77,9 @@ jobs:
       with:
         name: mutation-report
         path: src/StrykerOutput
+
+    - name: Pack
+      run: dotnet pack src/*.sln --configuration Release /p:Version=${{ env.BUILD_VER }} --output nupkgs
+        
+    - name: Publish To Nuget
+      run: dotnet nuget push nupkgs/*.nupkg -s 'https://api.nuget.org/v3/index.json' -k ${{secrets.NUGET_GALLERY_API_KEY}}

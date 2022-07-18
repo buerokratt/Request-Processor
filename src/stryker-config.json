@@ -1,6 +1,6 @@
 {
   "stryker-config": {
-    "test-projects": [ "./RequestProcessor.UnitTests/RequestProcessor.UnitTests.csproj" ],
+    "test-projects": [ "./Buerokratt.Common.UnitTests/Buerokratt.Common.UnitTests.csproj" ],
     "reporters": [
       "progress",
       "cleartext",
