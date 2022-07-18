@@ -2,7 +2,7 @@
 using System;
 using Xunit;
 
-namespace Buerokratt.Common.UnitTests
+namespace Buerokratt.Common.UnitTests.Encoder
 {
     public class EncodingServiceTest
     {

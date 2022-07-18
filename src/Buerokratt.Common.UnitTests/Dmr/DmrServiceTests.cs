@@ -10,7 +10,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Buerokratt.Common.UnitTests
+namespace Buerokratt.Common.UnitTests.Dmr
 {
     public sealed class DmrServiceTests : IDisposable
     {

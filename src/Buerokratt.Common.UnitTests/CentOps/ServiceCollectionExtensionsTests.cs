@@ -3,7 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System;
 using Xunit;
 
-namespace Buerokratt.Common.UnitTests
+namespace Buerokratt.Common.UnitTests.CentOps
 {
     public class ServiceCollectionExtensionsTests
     {
@@ -14,7 +14,7 @@ namespace Buerokratt.Common.UnitTests
             var services = new ServiceCollection();
 
             //Act & Assert
-            _ = Assert.Throws<ArgumentNullException>(() => ServiceCollectionExtensions.AddParticipantPoller(services, null));
+            _ = Assert.Throws<ArgumentNullException>(() => services.AddParticipantPoller(null));
         }
 
         [Fact]
@@ -25,7 +25,7 @@ namespace Buerokratt.Common.UnitTests
             var settings = new CentOpsServiceSettings();
 
             // Act
-            ServiceCollectionExtensions.AddParticipantPoller(services, settings);
+            services.AddParticipantPoller(settings);
 
             // Assert
             Assert.Contains(services, service => service.ServiceType.Name == "CentOpsServiceSettings");

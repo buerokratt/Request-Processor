@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
-namespace Buerokratt.Common.UnitTests
+namespace Buerokratt.Common.UnitTests.CentOps
 {
     public class ParticipantPollerTests
     {
