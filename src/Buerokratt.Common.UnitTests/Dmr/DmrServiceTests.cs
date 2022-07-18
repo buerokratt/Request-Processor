@@ -1,4 +1,6 @@
-﻿using Buerokratt.Common.Dmr;
+﻿using Buerokratt.Common.CentOps.Interfaces;
+using Buerokratt.Common.CentOps.Models;
+using Buerokratt.Common.Dmr;
 using Buerokratt.Common.Models;
 using Buerokratt.Common.UnitTests.Extensions;
 using Microsoft.Extensions.Logging;
@@ -14,22 +16,36 @@ namespace Buerokratt.Common.UnitTests.Dmr
 {
     public sealed class DmrServiceTests : IDisposable
     {
-        private static readonly DmrServiceSettings DefaultServiceConfig = new()
-        {
-            DmrApiUri = new Uri("https://dmr.fakeurl.com")
-        };
-
         private readonly MockHttpMessageHandler httpMessageHandler = new();
         private readonly Mock<ILogger<DmrService>> logger = new();
+
+        private static ICentOpsService ConfigureCentOps()
+        {
+            var centOpsMock = new Mock<ICentOpsService>();
+            _ = centOpsMock.Setup(x => x.FetchParticipantsByType(ParticipantType.Dmr))
+                       .ReturnsAsync(new[]
+                       {
+                           new Participant
+                           {
+                               Host = "https://dmr.fakeurl.com",
+                               Name = "Dmr",
+                               Type = ParticipantType.Dmr,
+                               Id = "1"
+                           }
+                       });
+
+            return centOpsMock.Object;
+        }
 
         [Fact]
         public async Task ShouldCallDmrApiWithGivenRequestWhenRequestIsRecorded()
         {
             _ = httpMessageHandler.SetupWithExpectedMessage();
 
-            var clientFactory = GetHttpClientFactory(httpMessageHandler, DefaultServiceConfig);
+            var centOps = ConfigureCentOps();
+            var clientFactory = GetHttpClientFactory(httpMessageHandler);
 
-            var sut = new DmrService(clientFactory.Object, DefaultServiceConfig, logger.Object);
+            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), logger.Object);
 
             sut.Enqueue(GetDmrRequest());
 
@@ -41,13 +57,14 @@ namespace Buerokratt.Common.UnitTests.Dmr
         [Fact]
         public async Task ShouldCallDmrApiForEachGivenRequestWhenMultipleRequestsAreRecorded()
         {
+            var centOps = ConfigureCentOps();
             _ = httpMessageHandler
                 .SetupWithExpectedMessage("my first message", "education")
                 .SetupWithExpectedMessage("my second message", "social");
 
-            var clientFactory = GetHttpClientFactory(httpMessageHandler, DefaultServiceConfig);
+            var clientFactory = GetHttpClientFactory(httpMessageHandler);
 
-            var sut = new DmrService(clientFactory.Object, DefaultServiceConfig, logger.Object);
+            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), logger.Object);
 
             sut.Enqueue(GetDmrRequest("my first message", "education"));
             sut.Enqueue(GetDmrRequest("my second message", "social"));
@@ -60,30 +77,27 @@ namespace Buerokratt.Common.UnitTests.Dmr
         [Fact]
         public async Task ShouldNotThrowExceptionWhenCallToDmrApiErrors()
         {
+            var centOps = ConfigureCentOps();
             using var dmrHttpClient = new MockHttpMessageHandler();
             _ = dmrHttpClient.When("/").Respond(HttpStatusCode.BadGateway);
 
-            var clientFactory = GetHttpClientFactory(dmrHttpClient, DefaultServiceConfig);
+            var clientFactory = GetHttpClientFactory(dmrHttpClient);
 
-            var sut = new DmrService(clientFactory.Object, DefaultServiceConfig, logger.Object);
+            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), logger.Object);
 
             sut.Enqueue(GetDmrRequest());
 
             await sut.ProcessRequestsAsync().ConfigureAwait(false);
         }
 
-        private static Mock<IHttpClientFactory> GetHttpClientFactory(MockHttpMessageHandler messageHandler, DmrServiceSettings settings)
+        private static Mock<IHttpClientFactory> GetHttpClientFactory(MockHttpMessageHandler messageHandler)
         {
-            settings ??= DefaultServiceConfig;
-
             var mockHttpClientFactory = new Mock<IHttpClientFactory>();
             _ = mockHttpClientFactory
                 .Setup(m => m.CreateClient(It.IsAny<string>()))
                 .Returns(() =>
                 {
                     var client = messageHandler.ToHttpClient();
-                    client.BaseAddress = settings.DmrApiUri;
-
                     return client;
                 });
 
