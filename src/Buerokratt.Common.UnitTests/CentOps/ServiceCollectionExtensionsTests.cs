@@ -28,10 +28,12 @@ namespace Buerokratt.Common.UnitTests.CentOps
             services.AddParticipantPoller(settings);
 
             // Assert
-            Assert.Contains(services, service => service.ServiceType.Name == "CentOpsServiceSettings");
-            Assert.Contains(services, service => service.ServiceType.Name == "IHostedService");
-            Assert.Contains(services, service => service.ServiceType.Name == "ICentOpsService");
-            Assert.Contains(services, service => service.ServiceType.Name.Contains("ConcurrentDictionary", StringComparison.InvariantCultureIgnoreCase));
+            Assert.Contains(services, service => service.ServiceType.Name == "CentOpsServiceSettings" && service.Lifetime == ServiceLifetime.Singleton);
+            Assert.Contains(services, service => service.ServiceType.Name == "IHostedService" && service.Lifetime == ServiceLifetime.Singleton);
+            Assert.Contains(services, service => service.ServiceType.Name == "ICentOpsService" && service.Lifetime == ServiceLifetime.Transient);
+            Assert.Contains(services,
+                service => service.ServiceType.Name.Contains("ConcurrentDictionary", StringComparison.InvariantCultureIgnoreCase)
+                        && service.Lifetime == ServiceLifetime.Singleton);
         }
     }
 }
