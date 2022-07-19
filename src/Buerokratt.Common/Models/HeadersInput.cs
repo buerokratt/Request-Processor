@@ -9,24 +9,24 @@ namespace Buerokratt.Common.Models
     public class HeadersInput
     {
         [Required]
-        [FromHeader(Name = Constants.XSentByHeaderName)]
+        [FromHeader(Name = Headers.XSentByHeaderName)]
         public string? XSentBy { get; set; }
 
         [Required]
-        [FromHeader(Name = Constants.XSendToHeaderName)]
+        [FromHeader(Name = Headers.XSendToHeaderName)]
         public string? XSendTo { get; set; }
 
         [Required]
-        [FromHeader(Name = Constants.XMessageIdHeaderName)]
+        [FromHeader(Name = Headers.XMessageIdHeaderName)]
         public string? XMessageId { get; set; }
 
-        [FromHeader(Name = Constants.XMessageIdRefHeaderName)]
+        [FromHeader(Name = Headers.XMessageIdRefHeaderName)]
         public string? XMessageIdRef { get; set; }
 
-        [FromHeader(Name = Constants.XModelTypeHeaderName)]
+        [FromHeader(Name = Headers.XModelTypeHeaderName)]
         public string? XModelType { get; set; }
 
-        [FromHeader(Name = Constants.ContentTypeHeaderName)]
+        [FromHeader(Name = Headers.ContentTypeHeaderName)]
         public string? ContentType { get; set; }
     }
 }
