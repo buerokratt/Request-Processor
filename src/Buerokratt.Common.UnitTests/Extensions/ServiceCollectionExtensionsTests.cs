@@ -31,7 +31,7 @@ namespace Buerokratt.Common.UnitTests.Extensions
             //Arrange
             DmrServiceSettings dmrSettings = new()
             {
-                ClientName = "Foo",
+                ClientName = "DmrClient"
             };
 
             CentOpsServiceSettings centOpsSettings = new()

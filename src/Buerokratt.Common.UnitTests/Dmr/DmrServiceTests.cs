@@ -59,7 +59,7 @@ namespace Buerokratt.Common.UnitTests.Dmr
             _httpMessageHandler.VerifyNoOutstandingExpectation();
 
             var entry = _mockLogger.VerifyLogEntry();
-            _ = entry.HasEventId(new EventId(1, "DmrCallbackPosted"))
+            _ = entry.HasEventId(new EventId(1, nameof(Common.Dmr.Extensions.LoggerExtensions.DmrCallbackSucceeded)))
                      .HasLogLevel(LogLevel.Information);
         }
 
@@ -89,11 +89,11 @@ namespace Buerokratt.Common.UnitTests.Dmr
             _httpMessageHandler.VerifyNoOutstandingExpectation();
 
             var entry1 = _mockLogger.VerifyLogEntry();
-            _ = entry1.HasEventId(new EventId(1, "DmrCallbackPosted"))
+            _ = entry1.HasEventId(new EventId(1, nameof(Common.Dmr.Extensions.LoggerExtensions.DmrCallbackSucceeded)))
                      .HasLogLevel(LogLevel.Information);
 
             var entry2 = _mockLogger.VerifyLogEntry();
-            _ = entry2.HasEventId(new EventId(1, "DmrCallbackPosted"))
+            _ = entry2.HasEventId(new EventId(1, nameof(Common.Dmr.Extensions.LoggerExtensions.DmrCallbackSucceeded)))
                      .HasLogLevel(LogLevel.Information);
         }
 
@@ -116,7 +116,7 @@ namespace Buerokratt.Common.UnitTests.Dmr
 
             // Assert
             var entry = _mockLogger.VerifyLogEntry();
-            _ = entry.HasEventId(new EventId(2, "DmrCallbackFailed"))
+            _ = entry.HasEventId(new EventId(2, nameof(Common.Dmr.Extensions.LoggerExtensions.DmrCallbackSucceeded)))
                      .HasLogLevel(LogLevel.Error);
         }
 
@@ -141,7 +141,7 @@ namespace Buerokratt.Common.UnitTests.Dmr
 
             // Assert
             var entry = _mockLogger.VerifyLogEntry();
-            _ = entry.HasEventId(new EventId(2, "DmrCallbackFailed"))
+            _ = entry.HasEventId(new EventId(2, nameof(Common.Dmr.Extensions.LoggerExtensions.DmrCallbackFailed)))
                      .HasExceptionOfType<KeyNotFoundException>()
                      .HasLogLevel(LogLevel.Error);
 

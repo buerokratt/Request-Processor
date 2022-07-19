@@ -45,7 +45,7 @@ namespace Buerokratt.Common.Dmr
                 var response = await HttpClient.SendAsync(requestMessage).ConfigureAwait(false);
                 response.EnsureSuccessStatusCode();
 
-                Logger.DmrCallback(payload.Payload?.Classification ?? string.Empty, payload.Payload?.Message ?? string.Empty);
+                Logger.DmrCallbackSucceeded(payload.Payload?.Classification ?? string.Empty, payload.Payload?.Message ?? string.Empty);
             }
             catch (HttpRequestException exception)
             {
