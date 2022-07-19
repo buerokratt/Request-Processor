@@ -24,12 +24,12 @@ namespace Buerokratt.Common.UnitTests.Extensions
             _ = handler
                 .Expect("/")
                 .WithContent(jsonPayloadBase64)
-                .WithHeaders(Headers.XSentByHeaderName, "MockClassifier.UnitTests.Services.Dmr.DmrServiceTests")
-                .WithHeaders(Headers.XSendToHeaderName, ParticipantIds.ClassifierId)
-                .WithHeaders(Headers.XModelTypeHeaderName, "application/vnd.classifier.classification+json;version=1")
-                .WithHeaders(Headers.XMessageIdHeaderName, "1f7b356d-a6f4-4aeb-85cd-9d570dbc7606")
-                .WithHeaders(Headers.XMessageIdRefHeaderName, "5822c6ef-177d-4dd7-b4c5-0d9d8c8d2c35")
-                .WithHeaders(Headers.ContentTypeHeaderName, "text/plain")
+                .WithHeaders(HeaderNames.XSentByHeaderName, "MockClassifier.UnitTests.Services.Dmr.DmrServiceTests")
+                .WithHeaders(HeaderNames.XSendToHeaderName, ParticipantIds.ClassifierId)
+                .WithHeaders(HeaderNames.XModelTypeHeaderName, "application/vnd.classifier.classification+json;version=1")
+                .WithHeaders(HeaderNames.XMessageIdHeaderName, "1f7b356d-a6f4-4aeb-85cd-9d570dbc7606")
+                .WithHeaders(HeaderNames.XMessageIdRefHeaderName, "5822c6ef-177d-4dd7-b4c5-0d9d8c8d2c35")
+                .WithHeaders(HeaderNames.ContentTypeHeaderName, "text/plain")
                 .Respond(HttpStatusCode.Accepted);
 
             return handler;
