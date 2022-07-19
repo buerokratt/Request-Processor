@@ -31,5 +31,10 @@ namespace Buerokratt.Common.Models
         /// Specifies the content type of the message as understood by Buerokratt participants.
         /// </summary>
         public const string XModelTypeHeaderName = "X-Model-Type";
+
+        /// <summary>
+        /// Specifies the content type of the message.
+        /// </summary>
+        public const string ContentTypeHeaderName = "Content-Type";
     }
 }
