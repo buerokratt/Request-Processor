@@ -4,9 +4,11 @@ using Buerokratt.Common.Dmr;
 using Buerokratt.Common.Models;
 using Buerokratt.Common.UnitTests.Extensions;
 using Microsoft.Extensions.Logging;
+using MockLogging;
 using Moq;
 using RichardSzalay.MockHttp;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
@@ -18,15 +20,7 @@ namespace Buerokratt.Common.UnitTests.Dmr
     public sealed class DmrServiceTests : IDisposable
     {
         private readonly MockHttpMessageHandler _httpMessageHandler = new();
-        private readonly Mock<ILogger<DmrService>> _logger;
-
-        public DmrServiceTests()
-        {
-            _logger = new Mock<ILogger<DmrService>>();
-            _ = _logger
-                .Setup(m => m.IsEnabled(It.IsAny<LogLevel>()))
-                .Returns(true);
-        }
+        private MockLogger<DmrService> _mockLogger = new();
 
         private static ICentOpsService ConfigureCentOps()
         {
@@ -55,8 +49,7 @@ namespace Buerokratt.Common.UnitTests.Dmr
             var centOps = ConfigureCentOps();
             var clientFactory = GetHttpClientFactory(_httpMessageHandler);
 
-            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), _logger.Object);
-
+            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), _mockLogger);
             sut.Enqueue(GetDmrRequest());
 
             // Act
@@ -65,13 +58,9 @@ namespace Buerokratt.Common.UnitTests.Dmr
             // Assert
             _httpMessageHandler.VerifyNoOutstandingExpectation();
 
-            _logger.Verify(
-               m => m.Log(
-                   LogLevel.Information,
-                   It.Is<EventId>(e => e.Id == 1 && e.Name == "DmrCallbackPosted"),
-                   It.Is<It.IsAnyType>((v, t) => true),
-                   It.IsAny<Exception>(),
-                   It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once());
+            var entry = _mockLogger.VerifyLogEntry();
+            _ = entry.HasEventId(new EventId(1, "DmrCallbackPosted"))
+                     .HasLogLevel(LogLevel.Information);
         }
 
         [Fact]
@@ -85,7 +74,7 @@ namespace Buerokratt.Common.UnitTests.Dmr
 
             var clientFactory = GetHttpClientFactory(_httpMessageHandler);
 
-            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), _logger.Object);
+            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), _mockLogger);
 
             sut.Enqueue(GetDmrRequest("my first message", "education"));
             sut.Enqueue(GetDmrRequest("my second message", "social"));
@@ -96,13 +85,13 @@ namespace Buerokratt.Common.UnitTests.Dmr
             // Assert
             _httpMessageHandler.VerifyNoOutstandingExpectation();
 
-            _logger.Verify(
-               m => m.Log(
-                   LogLevel.Information,
-                   It.Is<EventId>(e => e.Id == 1 && e.Name == "DmrCallbackPosted"),
-                   It.Is<It.IsAnyType>((v, t) => true),
-                   It.IsAny<Exception>(),
-                   It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Exactly(2));
+            var entry1 = _mockLogger.VerifyLogEntry();
+            _ = entry1.HasEventId(new EventId(1, "DmrCallbackPosted"))
+                     .HasLogLevel(LogLevel.Information);
+
+            var entry2 = _mockLogger.VerifyLogEntry();
+            _ = entry2.HasEventId(new EventId(1, "DmrCallbackPosted"))
+                     .HasLogLevel(LogLevel.Information);
         }
 
         [Fact]
@@ -115,7 +104,7 @@ namespace Buerokratt.Common.UnitTests.Dmr
 
             var clientFactory = GetHttpClientFactory(dmrHttpClient);
 
-            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), _logger.Object);
+            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), _mockLogger);
 
             sut.Enqueue(GetDmrRequest());
 
@@ -123,13 +112,9 @@ namespace Buerokratt.Common.UnitTests.Dmr
             await sut.ProcessRequestsAsync().ConfigureAwait(false);
 
             // Assert
-            _logger.Verify(
-                m => m.Log(
-                    LogLevel.Error,
-                    It.Is<EventId>(e => e.Id == 2 && e.Name == "DmrCallbackFailed"),
-                    It.Is<It.IsAnyType>((v, t) => true),
-                    It.IsAny<HttpRequestException>(),
-                    It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
+            var entry = _mockLogger.VerifyLogEntry();
+            _ = entry.HasEventId(new EventId(2, "DmrCallbackFailed"))
+                     .HasLogLevel(LogLevel.Error);
         }
 
         [Fact]
@@ -144,7 +129,7 @@ namespace Buerokratt.Common.UnitTests.Dmr
 
             var clientFactory = GetHttpClientFactory(dmrHttpClient);
 
-            var sut = new DmrService(centOpsMock.Object, clientFactory.Object, new DmrServiceSettings(), _logger.Object);
+            var sut = new DmrService(centOpsMock.Object, clientFactory.Object, new DmrServiceSettings(), _mockLogger);
 
             sut.Enqueue(GetDmrRequest());
 
@@ -152,13 +137,12 @@ namespace Buerokratt.Common.UnitTests.Dmr
             await sut.ProcessRequestsAsync().ConfigureAwait(false);
 
             // Assert
-            _logger.Verify(
-                m => m.Log(
-                    LogLevel.Error,
-                    It.Is<EventId>(e => e.Id == 2 && e.Name == "DmrCallbackFailed"),
-                    It.Is<It.IsAnyType>((v, t) => true),
-                    It.Is<Exception>(ex => ex.Message == "No active DMRs found."),
-                    It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
+            var entry = _mockLogger.VerifyLogEntry();
+            _ = entry.HasEventId(new EventId(2, "DmrCallbackFailed"))
+                     .HasExceptionOfType<KeyNotFoundException>()
+                     .HasLogLevel(LogLevel.Error);
+
+            Assert.Equal("No active DMRs found.", entry.Exception.Message);
         }
 
         private static Mock<IHttpClientFactory> GetHttpClientFactory(MockHttpMessageHandler messageHandler)
