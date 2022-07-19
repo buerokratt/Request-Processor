@@ -43,7 +43,11 @@ namespace Buerokratt.Common.Dmr
 
                 // Send request
                 var response = await HttpClient.SendAsync(requestMessage).ConfigureAwait(false);
-                response.EnsureSuccessStatusCode();
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorReason = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+                    throw new HttpRequestException(errorReason);
+                }
 
                 Logger.DmrCallbackSucceeded(payload.Payload?.Classification ?? string.Empty, payload.Payload?.Message ?? string.Empty);
             }
@@ -85,7 +89,7 @@ namespace Buerokratt.Common.Dmr
 
         private async Task<HttpRequestMessage> CreateRequestMessage(DmrRequest request)
         {
-            var dmr = await this.ResolveDmr();
+            var dmr = await ResolveDmr();
 
             var jsonPayload = JsonSerializer.Serialize(request.Payload);
             var jsonPayloadBase64 = EncodeBase64(jsonPayload);

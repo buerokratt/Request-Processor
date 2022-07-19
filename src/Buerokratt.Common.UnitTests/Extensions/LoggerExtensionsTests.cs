@@ -1,8 +1,6 @@
-﻿using Buerokratt.Common.Dmr;
-using Buerokratt.Common.Dmr.Extensions;
+﻿using Buerokratt.Common.Dmr.Extensions;
 using Microsoft.Extensions.Logging;
 using MockLogging;
-using Moq;
 using System;
 using Xunit;
 
