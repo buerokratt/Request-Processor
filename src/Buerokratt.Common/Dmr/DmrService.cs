@@ -43,12 +43,7 @@ namespace Buerokratt.Common.Dmr
 
                 // Send request
                 var response = await HttpClient.SendAsync(requestMessage).ConfigureAwait(false);
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    var errorReason = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
-                    throw new HttpRequestException(errorReason);
-                }
+                response.EnsureSuccessStatusCode();
 
                 Logger.DmrCallback(payload.Payload?.Classification ?? string.Empty, payload.Payload?.Message ?? string.Empty);
             }
@@ -60,20 +55,6 @@ namespace Buerokratt.Common.Dmr
             {
                 Logger.DmrCallbackFailed(knfException);
             }
-        }
-
-        private async Task<Participant> GetDmr()
-        {
-            // Get Dmr Instance.
-            var dmrs = await _centOps.FetchParticipantsByType(ParticipantType.Dmr);
-
-            if (!dmrs.Any())
-            {
-                throw new KeyNotFoundException($"No Classifiers found.");
-            }
-
-            // Whilst the behaviour remains undefined - we'll return the first Dmr we receive.
-            return dmrs.First();
         }
 
         private static string EncodeBase64(string content)
@@ -88,9 +69,23 @@ namespace Buerokratt.Common.Dmr
             return base64;
         }
 
+        private async Task<Participant> ResolveDmr()
+        {
+            // Get Dmr Instance.
+            var dmrs = await _centOps.FetchParticipantsByType(ParticipantType.Dmr);
+
+            if (!dmrs.Any())
+            {
+                throw new KeyNotFoundException($"No active DMRs found.");
+            }
+
+            // Whilst the behaviour remains undefined - we'll return the first Dmr we receive.
+            return dmrs.First();
+        }
+
         private async Task<HttpRequestMessage> CreateRequestMessage(DmrRequest request)
         {
-            var dmr = await this.GetDmr();
+            var dmr = await this.ResolveDmr();
 
             var jsonPayload = JsonSerializer.Serialize(request.Payload);
             var jsonPayloadBase64 = EncodeBase64(jsonPayload);

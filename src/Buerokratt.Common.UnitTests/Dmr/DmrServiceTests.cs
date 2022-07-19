@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using RichardSzalay.MockHttp;
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -16,8 +17,16 @@ namespace Buerokratt.Common.UnitTests.Dmr
 {
     public sealed class DmrServiceTests : IDisposable
     {
-        private readonly MockHttpMessageHandler httpMessageHandler = new();
-        private readonly Mock<ILogger<DmrService>> logger = new();
+        private readonly MockHttpMessageHandler _httpMessageHandler = new();
+        private readonly Mock<ILogger<DmrService>> _logger;
+
+        public DmrServiceTests()
+        {
+            _logger = new Mock<ILogger<DmrService>>();
+            _ = _logger
+                .Setup(m => m.IsEnabled(It.IsAny<LogLevel>()))
+                .Returns(true);
+        }
 
         private static ICentOpsService ConfigureCentOps()
         {
@@ -40,54 +49,116 @@ namespace Buerokratt.Common.UnitTests.Dmr
         [Fact]
         public async Task ShouldCallDmrApiWithGivenRequestWhenRequestIsRecorded()
         {
-            _ = httpMessageHandler.SetupWithExpectedMessage();
+            // Arrange
+            _ = _httpMessageHandler.SetupWithExpectedMessage();
 
             var centOps = ConfigureCentOps();
-            var clientFactory = GetHttpClientFactory(httpMessageHandler);
+            var clientFactory = GetHttpClientFactory(_httpMessageHandler);
 
-            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), logger.Object);
+            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), _logger.Object);
 
             sut.Enqueue(GetDmrRequest());
 
+            // Act
             await sut.ProcessRequestsAsync().ConfigureAwait(false);
 
-            httpMessageHandler.VerifyNoOutstandingExpectation();
+            // Assert
+            _httpMessageHandler.VerifyNoOutstandingExpectation();
+
+            _logger.Verify(
+               m => m.Log(
+                   LogLevel.Information,
+                   It.Is<EventId>(e => e.Id == 1 && e.Name == "DmrCallbackPosted"),
+                   It.Is<It.IsAnyType>((v, t) => true),
+                   It.IsAny<Exception>(),
+                   It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Once());
         }
 
         [Fact]
         public async Task ShouldCallDmrApiForEachGivenRequestWhenMultipleRequestsAreRecorded()
         {
+            // A
             var centOps = ConfigureCentOps();
-            _ = httpMessageHandler
+            _ = _httpMessageHandler
                 .SetupWithExpectedMessage("my first message", "education")
                 .SetupWithExpectedMessage("my second message", "social");
 
-            var clientFactory = GetHttpClientFactory(httpMessageHandler);
+            var clientFactory = GetHttpClientFactory(_httpMessageHandler);
 
-            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), logger.Object);
+            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), _logger.Object);
 
             sut.Enqueue(GetDmrRequest("my first message", "education"));
             sut.Enqueue(GetDmrRequest("my second message", "social"));
 
+            // Act
             await sut.ProcessRequestsAsync().ConfigureAwait(false);
 
-            httpMessageHandler.VerifyNoOutstandingExpectation();
+            // Assert
+            _httpMessageHandler.VerifyNoOutstandingExpectation();
+
+            _logger.Verify(
+               m => m.Log(
+                   LogLevel.Information,
+                   It.Is<EventId>(e => e.Id == 1 && e.Name == "DmrCallbackPosted"),
+                   It.Is<It.IsAnyType>((v, t) => true),
+                   It.IsAny<Exception>(),
+                   It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)), Times.Exactly(2));
         }
 
         [Fact]
         public async Task ShouldNotThrowExceptionWhenCallToDmrApiErrors()
         {
+            // Arrange
             var centOps = ConfigureCentOps();
             using var dmrHttpClient = new MockHttpMessageHandler();
             _ = dmrHttpClient.When("/").Respond(HttpStatusCode.BadGateway);
 
             var clientFactory = GetHttpClientFactory(dmrHttpClient);
 
-            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), logger.Object);
+            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), _logger.Object);
 
             sut.Enqueue(GetDmrRequest());
 
+            // Act
             await sut.ProcessRequestsAsync().ConfigureAwait(false);
+
+            // Assert
+            _logger.Verify(
+                m => m.Log(
+                    LogLevel.Error,
+                    It.Is<EventId>(e => e.Id == 2 && e.Name == "DmrCallbackFailed"),
+                    It.Is<It.IsAnyType>((v, t) => true),
+                    It.IsAny<HttpRequestException>(),
+                    It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
+        }
+
+        [Fact]
+        public async Task ShouldThrowAndLogForMissingDmrInCentOps()
+        {
+            // Arrange
+            var centOpsMock = new Mock<ICentOpsService>();
+            _ = centOpsMock.Setup(c => c.FetchParticipantsByType(ParticipantType.Dmr)).ReturnsAsync(Enumerable.Empty<Participant>());
+
+            using var dmrHttpClient = new MockHttpMessageHandler();
+            _ = dmrHttpClient.When("/").Respond(HttpStatusCode.BadGateway);
+
+            var clientFactory = GetHttpClientFactory(dmrHttpClient);
+
+            var sut = new DmrService(centOpsMock.Object, clientFactory.Object, new DmrServiceSettings(), _logger.Object);
+
+            sut.Enqueue(GetDmrRequest());
+
+            // Act
+            await sut.ProcessRequestsAsync().ConfigureAwait(false);
+
+            // Assert
+            _logger.Verify(
+                m => m.Log(
+                    LogLevel.Error,
+                    It.Is<EventId>(e => e.Id == 2 && e.Name == "DmrCallbackFailed"),
+                    It.Is<It.IsAnyType>((v, t) => true),
+                    It.Is<Exception>(ex => ex.Message == "No active DMRs found."),
+                    It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)));
         }
 
         private static Mock<IHttpClientFactory> GetHttpClientFactory(MockHttpMessageHandler messageHandler)
@@ -131,7 +202,7 @@ namespace Buerokratt.Common.UnitTests.Dmr
 
         public void Dispose()
         {
-            httpMessageHandler.Dispose();
+            _httpMessageHandler.Dispose();
         }
     }
 }
