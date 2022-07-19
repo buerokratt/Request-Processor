@@ -1,9 +1,12 @@
 ﻿using Buerokratt.Common.AsyncProcessor;
+using Buerokratt.Common.CentOps.Interfaces;
+using Buerokratt.Common.CentOps.Models;
 using Buerokratt.Common.Dmr.Extensions;
 using Buerokratt.Common.Models;
 using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using System.Net.Mime;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 
@@ -14,12 +17,16 @@ namespace Buerokratt.Common.Dmr
     /// </summary>
     public class DmrService : AsyncProcessorService<DmrRequest, DmrServiceSettings>
     {
+        private readonly ICentOpsService _centOps;
+
         public DmrService(
+            ICentOpsService centOps,
             IHttpClientFactory httpClientFactory,
             DmrServiceSettings config,
             ILogger<DmrService> logger) :
                 base(httpClientFactory, config, logger)
         {
+            _centOps = centOps;
         }
 
         public override async Task ProcessRequestAsync(DmrRequest payload)
@@ -32,22 +39,25 @@ namespace Buerokratt.Common.Dmr
             try
             {
                 // Setup message
-                using var requestMessage = CreateRequestMessage(payload);
+                using var requestMessage = await CreateRequestMessage(payload);
 
                 // Send request
                 var response = await HttpClient.SendAsync(requestMessage).ConfigureAwait(false);
-
                 if (!response.IsSuccessStatusCode)
                 {
                     var errorReason = await response.Content.ReadAsStringAsync().ConfigureAwait(false);
                     throw new HttpRequestException(errorReason);
                 }
 
-                Logger.DmrCallback(payload.Payload?.Classification ?? string.Empty, payload.Payload?.Message ?? string.Empty);
+                Logger.DmrCallbackSucceeded(payload.Payload?.Classification ?? string.Empty, payload.Payload?.Message ?? string.Empty);
             }
             catch (HttpRequestException exception)
             {
                 Logger.DmrCallbackFailed(exception);
+            }
+            catch (KeyNotFoundException knfException)
+            {
+                Logger.DmrCallbackFailed(knfException);
             }
         }
 
@@ -63,8 +73,24 @@ namespace Buerokratt.Common.Dmr
             return base64;
         }
 
-        private static HttpRequestMessage CreateRequestMessage(DmrRequest request)
+        private async Task<Participant> ResolveDmr()
         {
+            // Get Dmr Instance.
+            var dmrs = await _centOps.FetchParticipantsByType(ParticipantType.Dmr);
+
+            if (!dmrs.Any())
+            {
+                throw new KeyNotFoundException($"No active DMRs found.");
+            }
+
+            // Whilst the behaviour remains undefined - we'll return the first Dmr we receive.
+            return dmrs.First();
+        }
+
+        private async Task<HttpRequestMessage> CreateRequestMessage(DmrRequest request)
+        {
+            var dmr = await ResolveDmr();
+
             var jsonPayload = JsonSerializer.Serialize(request.Payload);
             var jsonPayloadBase64 = EncodeBase64(jsonPayload);
             var content = new StringContent(
@@ -76,6 +102,7 @@ namespace Buerokratt.Common.Dmr
             {
                 Method = HttpMethod.Post,
                 Content = content,
+                RequestUri = new Uri(dmr.Host!)
             };
 
             requestMessage.Headers.Add(Constants.XMessageIdHeaderName, request.Headers.XMessageId);

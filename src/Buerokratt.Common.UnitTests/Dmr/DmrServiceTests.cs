@@ -1,10 +1,15 @@
-﻿using Buerokratt.Common.Dmr;
+﻿using Buerokratt.Common.CentOps.Interfaces;
+using Buerokratt.Common.CentOps.Models;
+using Buerokratt.Common.Dmr;
 using Buerokratt.Common.Models;
 using Buerokratt.Common.UnitTests.Extensions;
 using Microsoft.Extensions.Logging;
+using MockLogging;
 using Moq;
 using RichardSzalay.MockHttp;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -14,76 +19,143 @@ namespace Buerokratt.Common.UnitTests.Dmr
 {
     public sealed class DmrServiceTests : IDisposable
     {
-        private static readonly DmrServiceSettings DefaultServiceConfig = new()
-        {
-            DmrApiUri = new Uri("https://dmr.fakeurl.com")
-        };
+        private readonly MockHttpMessageHandler _httpMessageHandler = new();
+        private readonly MockLogger<DmrService> _mockLogger = new();
 
-        private readonly MockHttpMessageHandler httpMessageHandler = new();
-        private readonly Mock<ILogger<DmrService>> logger = new();
+        private static ICentOpsService ConfigureCentOps()
+        {
+            var centOpsMock = new Mock<ICentOpsService>();
+            _ = centOpsMock.Setup(x => x.FetchParticipantsByType(ParticipantType.Dmr))
+                       .ReturnsAsync(new[]
+                       {
+                           new Participant
+                           {
+                               Host = "https://dmr.fakeurl.com",
+                               Name = "Dmr",
+                               Type = ParticipantType.Dmr,
+                               Id = "1"
+                           }
+                       });
+
+            return centOpsMock.Object;
+        }
 
         [Fact]
         public async Task ShouldCallDmrApiWithGivenRequestWhenRequestIsRecorded()
         {
-            _ = httpMessageHandler.SetupWithExpectedMessage();
+            // Arrange
+            _ = _httpMessageHandler.SetupWithExpectedMessage();
 
-            var clientFactory = GetHttpClientFactory(httpMessageHandler, DefaultServiceConfig);
+            var centOps = ConfigureCentOps();
+            var clientFactory = GetHttpClientFactory(_httpMessageHandler);
 
-            var sut = new DmrService(clientFactory.Object, DefaultServiceConfig, logger.Object);
-
+            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), _mockLogger);
             sut.Enqueue(GetDmrRequest());
 
+            // Act
             await sut.ProcessRequestsAsync().ConfigureAwait(false);
 
-            httpMessageHandler.VerifyNoOutstandingExpectation();
+            // Assert
+            _httpMessageHandler.VerifyNoOutstandingExpectation();
+
+            var entry = _mockLogger.VerifyLogEntry();
+            _ = entry.HasEventId(new EventId(1, nameof(Common.Dmr.Extensions.LoggerExtensions.DmrCallbackSucceeded)))
+                     .HasLogLevel(LogLevel.Information);
         }
 
         [Fact]
         public async Task ShouldCallDmrApiForEachGivenRequestWhenMultipleRequestsAreRecorded()
         {
-            _ = httpMessageHandler
-                .SetupWithExpectedMessage("my first message", "education")
-                .SetupWithExpectedMessage("my second message", "social");
+            // Arrange
+            (string, string) expectedMessage1 = ("my first message", "education");
+            (string, string) expectedMessage2 = ("my second message", "social");
 
-            var clientFactory = GetHttpClientFactory(httpMessageHandler, DefaultServiceConfig);
+            var centOps = ConfigureCentOps();
+            _ = _httpMessageHandler
+                .SetupWithExpectedMessage(expectedMessage1.Item1, expectedMessage1.Item2)
+                .SetupWithExpectedMessage(expectedMessage2.Item1, expectedMessage2.Item2);
 
-            var sut = new DmrService(clientFactory.Object, DefaultServiceConfig, logger.Object);
+            var clientFactory = GetHttpClientFactory(_httpMessageHandler);
 
-            sut.Enqueue(GetDmrRequest("my first message", "education"));
-            sut.Enqueue(GetDmrRequest("my second message", "social"));
+            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), _mockLogger);
 
+            sut.Enqueue(GetDmrRequest(expectedMessage1.Item1, expectedMessage1.Item2));
+            sut.Enqueue(GetDmrRequest(expectedMessage2.Item1, expectedMessage2.Item2));
+
+            // Act
             await sut.ProcessRequestsAsync().ConfigureAwait(false);
 
-            httpMessageHandler.VerifyNoOutstandingExpectation();
+            // Assert
+            _httpMessageHandler.VerifyNoOutstandingExpectation();
+
+            var entry1 = _mockLogger.VerifyLogEntry();
+            _ = entry1.HasEventId(new EventId(1, nameof(Common.Dmr.Extensions.LoggerExtensions.DmrCallbackSucceeded)))
+                     .HasLogLevel(LogLevel.Information);
+
+            var entry2 = _mockLogger.VerifyLogEntry();
+            _ = entry2.HasEventId(new EventId(1, nameof(Common.Dmr.Extensions.LoggerExtensions.DmrCallbackSucceeded)))
+                     .HasLogLevel(LogLevel.Information);
         }
 
         [Fact]
         public async Task ShouldNotThrowExceptionWhenCallToDmrApiErrors()
         {
+            // Arrange
+            var centOps = ConfigureCentOps();
             using var dmrHttpClient = new MockHttpMessageHandler();
             _ = dmrHttpClient.When("/").Respond(HttpStatusCode.BadGateway);
 
-            var clientFactory = GetHttpClientFactory(dmrHttpClient, DefaultServiceConfig);
+            var clientFactory = GetHttpClientFactory(dmrHttpClient);
 
-            var sut = new DmrService(clientFactory.Object, DefaultServiceConfig, logger.Object);
+            var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), _mockLogger);
 
             sut.Enqueue(GetDmrRequest());
 
+            // Act
             await sut.ProcessRequestsAsync().ConfigureAwait(false);
+
+            // Assert
+            var entry = _mockLogger.VerifyLogEntry();
+            _ = entry.HasEventId(new EventId(2, nameof(Common.Dmr.Extensions.LoggerExtensions.DmrCallbackSucceeded)))
+                     .HasLogLevel(LogLevel.Error);
         }
 
-        private static Mock<IHttpClientFactory> GetHttpClientFactory(MockHttpMessageHandler messageHandler, DmrServiceSettings settings)
+        [Fact]
+        public async Task ShouldThrowAndLogForMissingDmrInCentOps()
         {
-            settings ??= DefaultServiceConfig;
+            // Arrange
+            var centOpsMock = new Mock<ICentOpsService>();
+            _ = centOpsMock.Setup(c => c.FetchParticipantsByType(ParticipantType.Dmr)).ReturnsAsync(Enumerable.Empty<Participant>());
 
+            using var dmrHttpClient = new MockHttpMessageHandler();
+            _ = dmrHttpClient.When("/").Respond(HttpStatusCode.BadGateway);
+
+            var clientFactory = GetHttpClientFactory(dmrHttpClient);
+
+            var sut = new DmrService(centOpsMock.Object, clientFactory.Object, new DmrServiceSettings(), _mockLogger);
+
+            sut.Enqueue(GetDmrRequest());
+
+            // Act
+            await sut.ProcessRequestsAsync().ConfigureAwait(false);
+
+            // Assert
+            var entry = _mockLogger.VerifyLogEntry();
+            _ = entry.HasEventId(new EventId(2, nameof(Common.Dmr.Extensions.LoggerExtensions.DmrCallbackFailed)))
+                     .HasExceptionOfType<KeyNotFoundException>()
+                     .HasLogLevel(LogLevel.Error);
+
+            Assert.Equal("No active DMRs found.", entry.Exception.Message);
+        }
+
+        private static Mock<IHttpClientFactory> GetHttpClientFactory(MockHttpMessageHandler messageHandler)
+        {
             var mockHttpClientFactory = new Mock<IHttpClientFactory>();
             _ = mockHttpClientFactory
                 .Setup(m => m.CreateClient(It.IsAny<string>()))
                 .Returns(() =>
                 {
                     var client = messageHandler.ToHttpClient();
-                    client.BaseAddress = settings.DmrApiUri;
-
                     return client;
                 });
 
@@ -117,7 +189,7 @@ namespace Buerokratt.Common.UnitTests.Dmr
 
         public void Dispose()
         {
-            httpMessageHandler.Dispose();
+            _httpMessageHandler.Dispose();
         }
     }
 }

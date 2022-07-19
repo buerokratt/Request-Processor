@@ -1,4 +1,5 @@
 ﻿using Buerokratt.Common.AsyncProcessor;
+using Buerokratt.Common.CentOps;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 
@@ -14,23 +15,31 @@ namespace Buerokratt.Common.Dmr.Extensions
         /// </summary>
         /// <param name="services">The services collection that <see cref="DmrService"/> and related services will be added to.</param>
         /// <param name="settings">A settings object for the <see cref="DmrService"/></param>
-        public static void AddDmrService(this IServiceCollection services, DmrServiceSettings settings)
+        public static void AddDmrService(this IServiceCollection services, DmrServiceSettings dmrSettings, CentOpsServiceSettings centOpsSettings)
         {
-            if (settings == null)
+            if (dmrSettings == null)
             {
-                throw new ArgumentNullException(nameof(settings));
+                throw new ArgumentNullException(nameof(dmrSettings));
             }
 
-            _ = services.AddHttpClient(settings.ClientName, client =>
+            _ = services.AddHttpClient(dmrSettings.ClientName, client =>
             {
-                client.BaseAddress = settings.DmrApiUri;
-                client.Timeout = TimeSpan.FromMilliseconds(settings.HttpRequestTimeoutMs);
+                client.Timeout = TimeSpan.FromMilliseconds(dmrSettings.HttpRequestTimeoutMs);
             });
 
-            services.TryAddSingleton(settings);
-            services.TryAddSingleton(settings as AsyncProcessorSettings);
+            if (centOpsSettings == null)
+            {
+                throw new ArgumentNullException(nameof(centOpsSettings));
+            }
+
+            // CentOps and participant poller now required for Dmr calls to succeed.
+            services.AddParticipantPoller(centOpsSettings);
+
+            services.TryAddSingleton(dmrSettings);
+            services.TryAddSingleton(dmrSettings as AsyncProcessorSettings);
             services.TryAddSingleton<IAsyncProcessorService<DmrRequest>, DmrService>();
             _ = services.AddHostedService<AsyncProcessorHostedService<DmrRequest>>();
+
         }
     }
 }
