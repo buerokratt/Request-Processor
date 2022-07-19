@@ -38,11 +38,6 @@ namespace Buerokratt.Common.Models
         public const string ContentTypeHeaderName = "Content-Type";
 
         /// <summary>
-        /// Content type specified when a routing error has occurred.
-        /// </summary>
-        public const string ErrorContentType = "application/vnd.dmr.error+json;version=1";
-
-        /// <summary>
         /// The Id of the classifier - specified when a message needs classification.
         /// </summary>
         public const string ClassifierId = "Classifier";
