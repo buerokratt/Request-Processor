@@ -20,7 +20,7 @@ namespace Buerokratt.Common.UnitTests.Dmr
     public sealed class DmrServiceTests : IDisposable
     {
         private readonly MockHttpMessageHandler _httpMessageHandler = new();
-        private MockLogger<DmrService> _mockLogger = new();
+        private readonly MockLogger<DmrService> _mockLogger = new();
 
         private static ICentOpsService ConfigureCentOps()
         {
@@ -66,18 +66,21 @@ namespace Buerokratt.Common.UnitTests.Dmr
         [Fact]
         public async Task ShouldCallDmrApiForEachGivenRequestWhenMultipleRequestsAreRecorded()
         {
-            // A
+            // Arrange
+            (string, string) expectedMessage1 = ("my first message", "education");
+            (string, string) expectedMessage2 = ("my second message", "social");
+
             var centOps = ConfigureCentOps();
             _ = _httpMessageHandler
-                .SetupWithExpectedMessage("my first message", "education")
-                .SetupWithExpectedMessage("my second message", "social");
+                .SetupWithExpectedMessage(expectedMessage1.Item1, expectedMessage1.Item2)
+                .SetupWithExpectedMessage(expectedMessage2.Item1, expectedMessage2.Item2);
 
             var clientFactory = GetHttpClientFactory(_httpMessageHandler);
 
             var sut = new DmrService(centOps, clientFactory.Object, new DmrServiceSettings(), _mockLogger);
 
-            sut.Enqueue(GetDmrRequest("my first message", "education"));
-            sut.Enqueue(GetDmrRequest("my second message", "social"));
+            sut.Enqueue(GetDmrRequest(expectedMessage1.Item1, expectedMessage1.Item2));
+            sut.Enqueue(GetDmrRequest(expectedMessage2.Item1, expectedMessage2.Item2));
 
             // Act
             await sut.ProcessRequestsAsync().ConfigureAwait(false);
