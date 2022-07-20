@@ -40,7 +40,7 @@ namespace Buerokratt.Common.UnitTests.AsyncProcessor
                 Payload = "Test Data",
                 Headers = new HeadersInput
                 {
-                    XSendTo = Constants.ClassifierId,
+                    XSendTo = ParticipantIds.ClassifierId,
                     XSentBy = "Police",
                 }
             });

@@ -105,11 +105,11 @@ namespace Buerokratt.Common.Dmr
                 RequestUri = new Uri(dmr.Host!)
             };
 
-            requestMessage.Headers.Add(Constants.XMessageIdHeaderName, request.Headers.XMessageId);
-            requestMessage.Headers.Add(Constants.XMessageIdRefHeaderName, request.Headers.XMessageIdRef);
-            requestMessage.Headers.Add(Constants.XSendToHeaderName, request.Headers.XSendTo);
-            requestMessage.Headers.Add(Constants.XSentByHeaderName, request.Headers.XSentBy);
-            requestMessage.Headers.Add(Constants.XModelTypeHeaderName, request.Headers.XModelType);
+            requestMessage.Headers.Add(HeaderNames.XMessageIdHeaderName, request.Headers.XMessageId);
+            requestMessage.Headers.Add(HeaderNames.XMessageIdRefHeaderName, request.Headers.XMessageIdRef);
+            requestMessage.Headers.Add(HeaderNames.XSendToHeaderName, request.Headers.XSendTo);
+            requestMessage.Headers.Add(HeaderNames.XSentByHeaderName, request.Headers.XSentBy);
+            requestMessage.Headers.Add(HeaderNames.XModelTypeHeaderName, request.Headers.XModelType);
 
             // Unless specified by the caller - use the text/plain mime type.
             _ = content.Headers.ContentType = MediaTypeHeaderValue.Parse(request.Headers.ContentType ?? MediaTypeNames.Text.Plain);
