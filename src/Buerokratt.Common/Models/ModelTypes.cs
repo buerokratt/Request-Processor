@@ -1,6 +1,6 @@
 ﻿namespace Buerokratt.Common.Models
 {
-    public static class ContentTypes
+    public static class ModelTypes
     {
         /// <summary>
         /// Content type for a message specifying that a routing error has occurred.
