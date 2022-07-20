@@ -27,7 +27,7 @@ namespace Buerokratt.Common.Models
         [FromHeader(Name = HeaderNames.XModelTypeHeaderName)]
         public string? XModelType { get; set; }
 
-        [FromHeader(Name = MediaTypeNames.Text.Plain)]
+        [FromHeader(Name = HeaderNames.ContentTypeHeaderName)]
         public string? ContentType { get; set; }
     }
 }
